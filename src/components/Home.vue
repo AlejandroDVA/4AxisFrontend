@@ -176,4 +176,13 @@ export default {
   flex: 1;
   margin: 10px;
 }
+
+table {
+        width: 100%;
+        text-align: center; /* Centrar el contenido horizontalmente */
+    }
+
+    th, td {
+        padding: 10px;
+    }
 </style>
