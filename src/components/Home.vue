@@ -62,7 +62,7 @@ export default {
          async find(){
             this.loading = true;
             console.log("find",this.date,this.value)
-            let result = await axios.post("http://localhost:3000/convert",{
+            let result = await axios.post("https://4axisbackend.up.railway.app/convert",{
                 date:this.date,
                 value: this.value,
                 user: this.userName
@@ -82,7 +82,7 @@ export default {
             console.log("history")
             this.loading = true
             console.log("history",this.date,this.value)
-            let result = await axios.get("http://localhost:3000/history");
+            let result = await axios.get("https://4axisbackend.up.railway.app/history");
             if(result.status==200){
                 this.result=result.data;
                 console.log(result);

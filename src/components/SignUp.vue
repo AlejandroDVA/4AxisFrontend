@@ -28,7 +28,7 @@ export default {
     methods:{
         async signUp(){
             console.log("signup",this.name,this.email,this.password)
-            let result = await axios.post("http://localhost:3000/login",{
+            let result = await axios.post("https://4axisbackend.up.railway.app/login",{
                 email:this.email,
                 password: this.password,
             });
