@@ -1,42 +1,75 @@
 <template>
  
-
-<div class="register">
+<div>
 <div class="header">
-    <h1 class="title">UF Convertor</h1>
-    <p>rol: {{userRole}}</p>
+    <h1 class="title">UF to CLP</h1> 
+    <h2>Welcome back {{ userRole.charAt(0).toUpperCase() + userRole.slice(1) }}</h2>
 </div>
 
-<input type="text" v-model="value" placeholder="Enter Value" />
-<input type="text" v-model="date" placeholder="Enter Date" />
-<button v-on:click="find">Convert</button>
-<button v-on:click="logout">Logout</button>
+<div class="input-columns">
+    <div class="column">
+        <p>Enter UF value:</p>
+        <input type="text" v-model="value" placeholder="1.75" />
+    </div>
+    <div class="column">
+      <p>Select date:</p>
+      <input type="date" v-model="date" min="2018-01-01" max="2023-10-16" />
+    </div>
+    <div class="column">
+        <br>
+        <button v-on:click="find">Convert</button>
+    </div>
+    <div class="column">
+        <br>
+        <button v-on:click="logout">Logout</button>
+    </div>
+  </div>
+
+
 </div><br>
 <div>
-<p v-if="loading" role="alert">working on your petition...</p>
-<h3>Valor UF: {{ result.valor }}</h3>
-<h3>Monto: {{ result.responseCLP }} CLP</h3>
+    <p v-if="loading" role="alert">working on your petition...</p>
 </div><br>
-<div>
-    <button v-on:click="findHistory" v-if="userRole === 'admin'">Conversion History</button>
-    <div v-if="userRole === 'admin'" >
-        <button @click="exportToExcel">Exportar a Excel</button>
-        <ul>
-  <li v-for="(item, index) in items" :key="index">
-    <ul>
-      <li>User: {{ item.user }}</li>
-      <li>Activity Date: {{ item.activityDate }}</li>
-      <li>Origin Amount: {{ item.originAmount }}</li>
-      <li>Conversion Date: {{ item.convertionDate }}</li>
-      <li>Coin Value: {{ item.coinValue }}</li>
-      <li>Conversion Amount: {{ item.convertionAmount }}</li>
-    </ul>
-  </li>
-</ul>
-
+<div class="input-columns">
+<div class="column">
+    <h3>Valor UF: {{ result.valor || 0 }}</h3>
 </div>
+<div class="column">
+    <h3>Monto: {{ result.responseCLP || 0}} CLP</h3>
 </div>
-
+</div><br>
+<div class="input-columns">
+    <div class="column">
+        <button v-on:click="findHistory" v-if="userRole === 'admin'">Conversion History</button>
+    </div>
+    <div class="column" v-if="userRole === 'admin'" >
+        <button @click="exportToExcel">Generate excel</button>
+    </div>
+</div><br>
+<div v-if="userRole === 'admin'">
+    <table v-if="showTable">
+        <thead>
+            <tr>
+            <th>User</th>
+            <th>Activity Date</th>
+            <th>Origin Amount</th>
+            <th>Conversion Date</th>
+            <th>Coin Value</th>
+            <th>Conversion Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(item, index) in items" :key="index">
+            <td>{{ item.user }}</td>
+            <td>{{ item.activityDate }}</td>
+            <td>{{ item.originAmount }}</td>
+            <td>{{ item.convertionDate }}</td>
+            <td>{{ item.coinValue }}</td>
+            <td>{{ item.convertionAmount }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 </template>
 
 
@@ -54,16 +87,17 @@ export default {
             userRole: '',
             history: '',
             userName: '',
-            items: ''
+            items: '',
+            showTable: false
         }
         
     },
     methods:{
          async find(){
             this.loading = true;
-            console.log("find",this.date,this.value)
+            console.log("find",this.date,this.value);
             let result = await axios.post("https://4axisbackend.up.railway.app/convert",{
-                date:this.date,
+                date:this.formattedDate(),
                 value: this.value,
                 user: this.userName
             });
@@ -81,6 +115,7 @@ export default {
         async findHistory(){
             console.log("history")
             this.loading = true
+            this.showTable = !this.showTable;
             console.log("history",this.date,this.value)
             let result = await axios.get("https://4axisbackend.up.railway.app/history");
             if(result.status==200){
@@ -102,6 +137,13 @@ export default {
         XLSX.utils.book_append_sheet(wb, ws, 'Datos');
         XLSX.writeFile(wb, 'datos.xlsx');
         },
+        formattedDate() {
+        if (this.date) {
+            const [year, month, day] = this.date.split('-');
+            return `${day}-${month}-${year}`;
+        }
+        return '';
+        },
         logout(){
             console.log("logout")
             localStorage.clear();
@@ -122,3 +164,16 @@ export default {
         }
 }
 </script>
+
+<style>
+.input-columns {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.column {
+  flex: 1;
+  margin: 10px;
+}
+</style>
