@@ -32,10 +32,10 @@
 </div><br>
 <div class="input-columns">
 <div class="column">
-    <h3>Valor UF: {{ result.valor || 0 }}</h3>
+    <h3>UF unit value: {{ result.valor || 0 }} CLP</h3>
 </div>
 <div class="column">
-    <h3>Monto: {{ result.responseCLP || 0}} CLP</h3>
+    <h3>CLP total Value: {{ result.responseCLP || 0}} CLP</h3>
 </div>
 </div><br>
 <div class="input-columns">
