@@ -13,7 +13,7 @@
     </div>
     <div class="column">
       <p>Select date:</p>
-      <input type="date" v-model="date" min="2018-01-01" max="2023-10-16" />
+      <input type="date" id="dateInput" v-model="date" min="2018-01-01" max="2023-10-16" @input="handleDateInput" />
     </div>
     <div class="column">
         <br>
@@ -132,17 +132,34 @@ export default {
             }
         },
         exportToExcel() {
-        const ws = XLSX.utils.json_to_sheet(this.items);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Datos');
-        XLSX.writeFile(wb, 'datos.xlsx');
+            const ws = XLSX.utils.json_to_sheet(this.items);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+            XLSX.writeFile(wb, 'datos.xlsx');
+            },
+            formattedDate() {
+            if (this.date) {
+                const [year, month, day] = this.date.split('-');
+                return `${day}-${month}-${year}`;
+            }
+            return '';
         },
-        formattedDate() {
-        if (this.date) {
-            const [year, month, day] = this.date.split('-');
-            return `${day}-${month}-${year}`;
-        }
-        return '';
+        async handleDateInput() {
+            this.loading = true;
+            let result = await axios.post("https://4axisbackend.up.railway.app/unitUF",{
+                date:this.formattedDate(),
+                value: this.value,
+                user: this.userName
+            });
+            if(result.status==200){
+                console.log(result);
+                this.result = result.data;
+                this.loading = null;
+            }else{
+                console.log(result);
+                alert("invalid data");
+                this.loading = null;
+            }
         },
         logout(){
             console.log("logout")
